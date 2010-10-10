@@ -66,7 +66,6 @@ File: "/usr/lib64/python2.4/gzip.py", line 309, in _read_eof
 raise IOError, "CRC check failed"
 workaround : deleting the partial tarball in the download directory ( o maybe in the egg directory also )
 IOError: CRC check failed
-
 __
 TypeError: scripts() got an unexpected keyword argument 'relative_paths'
 workaround : pinning in versions.cfg plone.recipe.zope2zeoserver = 1.2 
