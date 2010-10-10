@@ -231,7 +231,7 @@ if test -x $BUILDPYTHON ; then
 	echo "install_setuptools: entering in :" $BUILDPYTHON 
 	test -e "$zishpythonsitedir/setuptools*egg"  || $BUILDPYTHON "$zishworkdir/ez_setup.py" #can fail if Cheetah or other eggs doesn't find headers  
 	test -e  "$zishpythonsitedir/ZopeSkel*egg" ||   $prefix/bin/easy_install ZopeSkel
-	test -e  "$zishpythonsitedir/virtualenv*egg" ||   $prefix/bin/easy_install virtualenv
+	test -e  "$zishpythonsitedir/virtualenv*egg" ||  $prefix/bin/easy_install virtualenv
 		if test -d $zishinstancesdir; then
 			cd $zishinstancesdir
 			echo "install_setuptools: entering in :" $zishinstancesdir
