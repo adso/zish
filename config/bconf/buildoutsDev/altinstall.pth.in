@@ -1,0 +1,3 @@
+import os, site
+site.addsitedir(os.path.abspath("@zishpythonlibdir@/site-packages"))
+

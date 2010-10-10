@@ -1,0 +1,73 @@
+########################################################################################################
+#
+# zish script ( "Zope into shared hostings" )
+# Try to install Zope 2/Plone 3 in unexpensive shared hosting accounts
+#
+# The aim of this package is to check if we have all requirements before to uncompress and compile 
+# the individual packages. This script has a much better alternative as PloneUnifiedInstaller !!!
+# So, consider just download PloneUnifiedInstaller and add the proper Zope.cgi file 
+#  
+# version: 0.2
+# License : GPL v3 or higher (http://www.gnu.org/licenses/gpl-3.0.txt) or see COPYING
+# Disclaimer: No warranty. Use at your own risk
+# Usage : 
+#			./configure --prefix=$HOME/opt [--enable-plone4]
+#			 make
+#			 make install
+# ---------------------------------------------------------------------------------------------------------
+# Author : adso  (adso.lists.pub@gmail.com subject:zish)
+# Date: 1th/November/2009
+# Feedback are welcome
+###########################################################################################################
+
+
+ The order of the compilation is Python , tcl , tk , Imaging , ldap, ...
+ Dependecies :						(  all this could be better done with autotools 						)
+ 1.- Python 2.4.6		 			( someone reported a bug in this makefile but i can not reproduce now 	) 
+ 2.- libxml2-python 				( tree.h , iconv.h , xsltconfig.h 						 				)
+ 3.- Tcl							( 								    									)
+ 4.- Tk  							( Tcl 																	)
+ 6.- Imaging-PIL-Tkinter 			( freetype, jpeg, tiff, zlib , tcl 										)
+ 5.- Setuptools (ez_setup.py )		( configuration files for easy_install and others packages 				)
+										python in path, altinstall.pth , distutils.cfg, paster.cfg 			)
+ 8.- buildout install				( copy the prepared buildout to instance_dir and zope.conf 				)
+
+
+# --- using autotools.----
+The way the Autotools are designed, a package author doesn't have to do anything to support prerequisite installed 
+in non-standard locations. The output of ./configure --help #includes the following lines:
+
+LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a nonstandard directory <lib dir>
+            
+CPPFLAGS    C/C++/Objective C preprocessor flags, e.g. -I<include dir> if  you have headers 
+in a nonstandard directory <include dir>
+           
+Therefore, if the installer has a prerequisite installed in a non standard location, he will have to issue 
+./configure CPPFLAGS=-I/non-standard-dir/include LDFLAGS=-L/non-standard-dir/lib
+
+
+For shake of simplicity zish configure script will only detect the overall requeriments and keep their values in variables,
+but will not execute nested configures. Leaving this task to a small script called from Makefiles.
+
+# get Missing OpenSSL es necesario para easy_install hashlib para el buildout de plone 4
+# podria ser necesario openssl en primer lugar para que pudiera acceder el buildout
+#http://www.openssl.org/source/openssl-1.0.0a.tar.gz , tambien podriamos encontrarla 
+# añadirla al LD_LIBARY_PATH o al ld.so.conf y no sufrir tanto. Lo he solucionado 
+# exportando CPPFLAGS y LDFLAGS antes del configure.
+
+Algunos problemas con la configuracion de distutils.cfg
+
+ --prefix no puede indicarse a nivel de este archivo porque da error
+
+si --site-dirs se indica da un error aunque realmente esté en el sys.path
+/home/freeinst/opt/lib/python2.4/site-packages (in --site-dirs) is not on sys.path
+
+File: "/usr/lib64/python2.4/gzip.py", line 309, in _read_eof
+raise IOError, "CRC check failed"
+workaround : deleting the partial tarball in the download directory ( o maybe in the egg directory also )
+IOError: CRC check failed
+
+__
+TypeError: scripts() got an unexpected keyword argument 'relative_paths'
+workaround : pinning in versions.cfg plone.recipe.zope2zeoserver = 1.2 
+

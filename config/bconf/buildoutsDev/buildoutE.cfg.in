@@ -1,0 +1,17 @@
+
+[python]
+recipe = zc.recipe.cmmi
+url = http://www.python.org/ftp/python/2.4.4/Python-2.4.4.tgz
+executable =  /opt/local/bin/python2.4
+extra_options=
+    --enable-unicode=ucs4
+    --with-threads
+    --with-readline
+
+
+
+[pythonbin]
+recipe = plone.recipe.command
+command = ln -s ${python:executable} ${buildout:bin-directory}/python
+
+

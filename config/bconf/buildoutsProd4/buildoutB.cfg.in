@@ -1,0 +1,109 @@
+[buildout]
+# paths to get the info
+# Plone versions pinning : http://dist.plone.org/release/4.0rc1/versions.cfg
+# Zope versions pinning : http://download.zope.org/Zope2/index/2.12.10/versions.cfg
+# zope2-url = http://pypi.python.org/packages/source/Z/Zope2/Zope2-2.12.10.zip
+
+executable = @prefix@/bin/python@py_version_short@
+eggs-directory = @prefix@/var/zopeservers/packages/eggs
+download-cache = @prefix@/var/zopeservers/packages/downloads
+
+newest = false
+#index =  http://download.zope.org/ppix
+#install-from-cache = true
+unzip = true
+
+
+extends = 
+    versions-Zope-@ZOPE_VERSION@.cfg
+    versions-@PLONE_VERSION@.cfg
+versions = versions
+
+
+
+baseparts =
+    instance
+    fss
+    productdistros
+
+
+eggs =
+    elementtree
+    Products.LinguaPlone
+    Products.Ploneboard
+    Products.SimpleAttachment
+    SQLAlchemy
+
+
+environment-vars =
+    PYTHON_EGG_CACHE ${buildout:directory}/var/.python-eggs
+    TMPDIR ${buildout:directory}/var/tmp
+    PTS_LANGUAGES es,en,ca
+
+
+[zope2]
+recipe = plone.recipe.zope2install
+# Zope 2.12.3 is completly eggified and the [zope2] part is not needed anymore
+fake-zope-eggs = false
+url = ${versions:zope2-url}
+zeo-address = 127.0.0.1:8100
+
+
+
+
+
+[instance]
+# For more information on this step and configuration options see:
+# http://pypi.python.org/pypi/plone.recipe.zope2instance
+recipe = plone.recipe.zope2instance
+zope2-location = ${zope2:location}
+user = admin:admin
+http-address = 8080
+#debug-mode = on
+#verbose-security = on
+blob-storage = var/blobstorage
+eggs =
+    Zope2 
+    Plone 
+    ${buildout:eggs}
+
+products =
+    ${buildout:directory}/products
+    ${productdistros:location}
+
+environment-vars = ${buildout:environment-vars}
+
+
+
+[fss]
+recipe = iw.recipe.fss
+zope-instances = 
+    ${instance:location}
+    ${zeoclient1:location}
+
+storages =
+    global /
+    instance_storage   ${instance:location}/storage_instance flat 
+    zeoclient1_storage ${zeoclient1:location}/storage_client1  flat
+
+
+
+[zmysqlda]
+recipe = cns.recipe.zmysqlda
+target = ${buildout:directory}/products
+
+
+
+[productdistros]
+# For more information on this step and configuration options see:
+# http://pypi.python.org/pypi/plone.recipe.distros
+recipe = plone.recipe.distros
+urls = 
+    http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
+nested-packages =
+version-suffix-packages =
+eggs =
+products =
+    ${buildout:directory}/products
+zcml =
+

@@ -1,0 +1,21 @@
+#check out the different between [install] command and [easy_install]
+[build]
+compiler = unix
+
+
+[install]
+# this raise the error " you must specify home or prefix/exec-prefix no both. 
+# So i let this commented only to warn people.  Don't set prefix in distutils.cfg sytem wide file
+#prefix = @prefix@
+#exec-prefix = @prefix@
+
+
+
+[easy_install]
+install-dir = @prefix@/lib/python2.4/site-packages
+script-dir = @prefix@/bin
+build-directory = @prefix@/tmp
+site-dirs = @prefix@/lib/python2.4/site-packages
+
+
+

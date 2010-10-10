@@ -1,0 +1,16 @@
+[pastescript]
+zope_user = freesoci
+newplone__eval__ = True
+zope2_install = 
+plone_products_install = 
+oldplone__eval__ = False
+egg_plugins__eval__ = []
+veryoldplone__eval__ = False
+plone_version = 3.2.1
+debug_mode = off
+plus = +
+zope_password = freesoci
+http_port__eval__ = 8080
+egg = pruebaB
+dot = .
+verbose_security = off

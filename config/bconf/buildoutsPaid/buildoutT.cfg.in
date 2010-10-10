@@ -1,0 +1,136 @@
+[buildout]
+extends =
+    buildoutB.cfg
+
+parts =
+    ${buildout:baseparts}
+    zeoclient1
+    zeoclient2_debug
+	pydev
+    zopepy
+    
+
+# Be aware about Products dependencies 
+# Ploneboard needs SimpleAttachment
+
+eggs += 
+    collective.ploneseltest
+    plone.reload < 0.11
+    iw.debug
+    Products.DocFinderTab
+    Products.Clouseau
+    Products.GloWorm
+
+
+
+# Reference any eggs you are developing here, one per line
+# e.g.: develop = src/my.package
+develop =
+     
+
+[deadlockdebugger]
+recipe = plone.recipe.bundlecheckout
+url = http://svn.nuxeo.org/pub/Zope2/DeadlockDebugger/trunk
+subfolder = DeadlockDebugger
+
+
+[enablesettrace]
+recipe = plone.recipe.bundlecheckout
+url = svn://svn.zope.org/Products.enablesettrace/trunk
+subfolder = enablesettrace
+
+
+[zptdebugger]
+recipe = plone.recipe.bundlecheckout
+url = http://svn.plone.org/svn/collective/ZPTDebugger/trunk
+subfolder = ZPTDebugger
+
+
+[zopeprofiler]
+recipe = plone.recipe.distros
+urls = http://www.dieter.handshake.de/pyprojects/zope/ZopeProfiler.tgz
+
+
+[zeo]
+recipe = plone.recipe.zope2zeoserver
+zope2-location = ${zope2:location}
+zeo-address = 127.0.0.1:8100
+
+
+[zeoclient1]
+recipe = plone.recipe.zope2instance
+zope2-location = ${zope2:location}
+zeo-client = true
+zeo-address = ${zeo:zeo-address}
+zeodb-cache-size = 5000
+zeo-client-cache-size = 300MB
+publisher-profile-file = ${buildout:directory}/var/zeoclient1/profile.data
+user = admin:admin
+http-address = 127.0.0.1:8080
+debug-mode = on
+verbose-security = on
+eggs =
+    ${buildout:eggs}
+    Plone
+
+
+# plone.reload and other development stuff can be here
+zcml = 	
+
+products =
+    ${buildout:directory}/products
+    ${productdistros:location}
+
+
+[zeoclient2_debug]
+recipe = plone.recipe.zope2instance
+zope2-location = ${zope2:location}
+zeo-client = true
+zeo-address = ${zeo:zeo-address}
+zeodb-cache-size = 5000
+zeo-client-cache-size = 300MB
+publisher-profile-file = ${buildout:directory}/var/zeoclient2_debug/profile.data
+user = ${zeoclient1:user}
+http-address = 
+    127.0.0.0:8080
+debug-mode = off
+verbose-security = on
+eggs = ${zeoclient1:eggs}
+
+zcml = ${zeoclient1:zcml}
+products =
+    ${zeoclient1:products}
+
+#zope-conf-additional = 
+#    zserver-threads 1
+
+
+
+
+[omelette]
+recipe = collective.recipe.omelette
+eggs = ${zeoclient1:eggs}
+products = ${zeoclient1:products}
+
+
+[zopeskel]
+recipe = zc.recipe.egg
+eggs =
+    PasteScript
+    ZopeSkel
+
+
+[zopepy]
+recipe = zc.recipe.egg
+eggs = ${zeoclient1:eggs}
+interpreter = zopepy
+extra-paths = ${zope2:location}/lib/python
+scripts = zopepy
+
+
+[pydev]
+recipe = pb.recipes.pydev
+eggs = ${instance:eggs}
+
+
+

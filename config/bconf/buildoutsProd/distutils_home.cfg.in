@@ -1,0 +1,24 @@
+#check out the different between [install] command and [easy_install]
+[build]
+compiler = unix
+ 
+[install]
+install-base = @prefix@
+install-platbase = @prefix@
+install-lib = @prefix@/lib/python$py_version_short/site-packages
+install-purelib = @prefix@/lib/python$py_version_short 
+install-platlib = @prefix@/lib/python$py_version_short
+install-scripts = @prefix@/bin
+install-data = @prefix@/share
+install-headers = @prefix@/include/python$py_version_short
+skip-build = 1 
+
+
+
+[easy_install]
+script-dir = @prefix@/bin
+install-dir = @prefix@/lib/python$py_version_short/site-packages
+#site-dirs = @prefix@/lib/python$py_version_short/site-packages
+
+
+

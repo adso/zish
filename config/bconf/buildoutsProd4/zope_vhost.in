@@ -1,0 +1,112 @@
+# This is only an example to set a virtual host for Zope in case 
+# you have access to the administration account ................
+
+# NameVirtualHost 192.168.1.130:*
+# 
+
+
+<VirtualHost 192.168.1.130:80>
+
+	ServerAdmin webmaster@zope.localhost
+    ServerName  zope.localhost	
+	DocumentRoot /opt/var/www
+
+	<Directory />
+		Options FollowSymlinks
+		AllowOverride None
+	</Directory>
+
+	<Directory /opt/var/www >
+		Options  MultiViews
+		AllowOverride None
+		Order Deny,Allow
+		Allow from all
+	</Directory>
+
+	<Directory /opt/var/www/instance>
+		Options  MultiViews
+		AllowOverride All
+		Order Deny,Allow
+		Allow from all
+	</Directory>
+
+	<IfModule userdir>
+		userDir public_html
+		userDir disabled root
+
+		<Directory /home/*/public_html/>
+		#AllowOverride None
+        AllowOverride FileInfo AuthConfig Limit Indexes Options 
+        Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec
+		# The multiviews option cause and 13 error permission denied if not 0755 applied to all user directory
+                <Limit GET POST OPTIONS>
+                        Order allow,deny
+                        Allow from all
+                </Limit>
+                <LimitExcept GET POST OPTIONS>
+                        Order deny,allow
+                        Deny from all
+                </LimitExcept>
+        </Directory>
+
+	<Directory /home/*/public_html/cgi-bin/>
+		AddHandler cgi-script .cgi
+		AllowOverride FileInfo AuthConfig Limit Indexes
+		Options ExecCGI FollowSymLinks
+		Order deny,allow
+		Allow from all
+	</Directory>
+
+	</IfModule>
+
+	# ---------------------------------------------------------------------------------------------------
+
+
+	<IfModule proxy_module>
+		 ProxyVia on
+		 ProxyRequests Off ## If On everbody can attact throught this machine. Never on.
+		 #ProxyPreserveHost On
+		 <Proxy *>
+		    Order deny,allow
+		    Deny from all
+		    Allow from 192.168.1.130
+		  </Proxy>
+		  <LocationMatch "^[^/]">
+		    Deny from all
+		  </LocationMatch>
+	
+	
+	 RewriteEngine On
+	 RewriteRule ^/(.*)$  http://%{SERVER_NAME}:8080/VirtualHostBase/http/%{SERVER_NAME}:80/community/VirtualHostRoot/$1 [P,L] 
+	</IfModule>
+
+
+	# ---------------------------------------------------------------------------------------------------
+	<IfModule fastcgi_module>
+	  FastCGIExternalServer /usr/sbin/apache2/home/adso/public_html \ 
+	    -host 192.168.1.130:8080 \
+	    -pass-header Authorization \ 
+	    -idle-timeout 60 \
+	    -appConnTimeout 0
+	</IfModule>
+
+
+	# ---------------------------------------------------------------------------------------------------
+	<IfModule cgid_module>
+   	 RewriteEngine on
+ 	 RewriteCond %{HTTP:Authorization}  ^(.*)
+ 	 RewriteRule ^/(.*) /home/adso/public_html/Zope.cgi$1  [e=HTTP_CGI_AUTHORIZATION:%1,t=application/x-httpd-cgi,l]
+	</IfModule>
+
+
+	LogLevel debug
+	ErrorLog /var/log/apache2/zope_error.log
+	CustomLog /var/log/apache2/zope_access.log combined
+
+
+</VirtualHost>
+
+
+
+
+

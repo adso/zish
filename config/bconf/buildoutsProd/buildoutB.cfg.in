@@ -1,0 +1,101 @@
+[buildout]
+executable = @prefix@/bin/python2.4
+eggs-directory = @prefix@/var/zopeservers/packages/eggs
+download-cache = @prefix@/var/zopeservers/packages/downloads
+
+newest = false
+#index =  http://download.zope.org/ppix
+#install-from-cache = true
+unzip = true
+
+
+extends = 
+    versions-@PLONE_VERSION@.cfg
+versions = versions
+
+
+baseparts =
+    zope2
+    instance
+    fss
+    productdistros
+
+
+find-links =
+    http://dist.plone.org
+    http://dist.plone.org/thirdparty
+
+
+eggs =
+    elementtree
+    Products.LinguaPlone
+    Products.Ploneboard
+    Products.SimpleAttachment
+    SQLAlchemy
+
+
+environment-vars =
+    PYTHON_EGG_CACHE ${buildout:directory}/var/.python-eggs
+    TMPDIR ${buildout:directory}/var/tmp
+    PTS_LANGUAGES es,en,ca
+
+
+[zope2]
+# For more information on this step and configuration options see:
+# http://pypi.python.org/pypi/plone.recipe.zope2install
+recipe = plone.recipe.zope2install
+fake-zope-eggs = true
+url = ${versions:zope2-url}
+zeo-address = 127.0.0.1:8100
+
+
+
+[instance]
+# For more information on this step and configuration options see:
+# http://pypi.python.org/pypi/plone.recipe.zope2instance
+recipe = plone.recipe.zope2instance
+zope2-location = ${zope2:location}
+user = admin:admin
+http-address = 8080
+#debug-mode = on
+#verbose-security = on
+eggs = 
+    Plone 
+    ${buildout:eggs}
+
+products =
+    ${buildout:directory}/products
+    ${productdistros:location}
+
+environment-vars = ${buildout:environment-vars}
+
+
+
+[fss]
+recipe = iw.recipe.fss
+zope-instances = 
+    ${instance:location}
+    ${zeoclient1:location}
+
+storages =
+    global /
+    instance_storage   ${instance:location}/storage_instance flat 
+    zeoclient1_storage ${zeoclient1:location}/storage_client1  flat
+
+
+[zmysqlda]
+recipe = cns.recipe.zmysqlda
+target = ${buildout:directory}/products
+
+
+
+[productdistros]
+# For more information on this step and configuration options see:
+# http://pypi.python.org/pypi/plone.recipe.distros
+recipe = plone.recipe.distros
+urls = 
+    http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
+nested-packages =
+version-suffix-packages =
+eggs =
+

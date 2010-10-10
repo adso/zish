@@ -1,0 +1,6 @@
+Options +FollowSymlinks +ExecCGI
+SetHandler cgi-script 
+RewriteEngine on
+RewriteCond %{HTTP:Authorization}  ^(.*)
+RewriteRule Zope.cgi/(.*) -  [e=HTTP_CGI_AUTHORIZATION:%1,t=application/x-httpd-cgi,l]
+

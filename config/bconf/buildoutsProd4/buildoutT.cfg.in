@@ -1,0 +1,48 @@
+[buildout]
+extends =
+    buildoutB.cfg
+
+parts =
+    ${buildout:baseparts}
+    zeoclient1
+    zopepy
+
+
+# Reference any eggs you are developing here, one per line
+# e.g.: develop = src/my.package
+develop =
+     
+
+
+[zeoclient1]
+recipe = plone.recipe.zope2instance
+zope2-location = ${zope2:location}
+user = admin:admin
+#debug-mode = on
+verbose-security = on
+zeo-client = true
+zeodb-cache-size = 5000
+zeo-client-cache-size = 300MB
+zeo-address = ${zope2:zeo-address}
+publisher-profile-file = ${buildout:directory}/var/zeoclient1/zeoclient1.profile
+eggs =
+    Plone
+    ${buildout:eggs}
+
+zcml = 	
+
+products =
+    ${buildout:directory}/products
+    ${productdistros:location}
+
+
+
+[zopepy]
+recipe = zc.recipe.egg
+eggs = 
+    ${instance:eggs}
+    ${zeoclient1:eggs}
+interpreter = zopepy
+extra-paths = ${zope2:location}/lib/python
+scripts = zopepy
+

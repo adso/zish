@@ -1,0 +1,11 @@
+#site.addsitedir(sitedir, known_paths=None)
+#Adds a directory to sys.path and processes its pth files.
+try:
+    import os
+    import sys 
+    import site
+except ImportError:
+    pass
+else:
+    sys.setdefaultencoding("utf-8")
+    site.addsitedir(os.path.abspath("@zishpythonlib@/site-packages"))

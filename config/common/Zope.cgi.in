@@ -1,0 +1,22 @@
+#! @prefix@/bin/pcgi-wrapper
+PCGI_NAME=Zope
+
+PCGI_ROOT=/
+
+PCGI_MODULE_PATH=@zishinstancedir@/parts/zope2/lib/python/Zope2
+
+PCGI_PUBLISHER=@prefix@/bin/pcgi_publisher.py
+
+PCGI_EXE=@prefix@/bin/python2.4
+
+PCGI_SOCKET_FILE=@zishinstancedir@/var/pcgi.soc
+
+PCGI_PID_FILE=@zishinstancedir@/var/pcgi.pid
+
+PCGI_ERROR_LOG=@zishinstancedir@/log/pcgi.log
+
+PCGI_DISPLAY_ERRORS=1
+
+BOBO_REALM=Zope
+
+INSTANCE_HOME=@zishinstancedir@

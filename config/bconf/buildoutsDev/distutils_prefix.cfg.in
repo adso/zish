@@ -1,0 +1,20 @@
+#check out the different between [install] command and [easy_install]
+# error:  you must supply either home or prefix, no both  ?? system distutils should not globally define "prefix"
+[build]
+compiler = unix
+
+
+[install]
+#prefix = @prefix@
+#exec-prefix = @prefix@
+
+[easy_install]
+install-dir = @prefix@/lib/python2.4/site-packages
+script-dir = @prefix@/bin
+build-directory = @prefix@/tmp
+# uncomnented raise an error in rc.buildout about 
+# not found site-packages in sys.path
+#site-dirs = @prefix@/lib/python2.4/site-packages
+
+
+

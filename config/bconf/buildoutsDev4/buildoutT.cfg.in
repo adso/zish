@@ -1,0 +1,70 @@
+[buildout]
+extends =
+    buildoutB.cfg
+
+extensions = mr.developer
+sources = sources
+auto-checkout += 
+
+
+parts +=
+    test
+    omelette
+unzip = true
+
+
+[omelette]
+recipe = collective.recipe.omelette
+eggs = ${instance:eggs}
+packages = ${instance:location}/lib/python ./
+
+[sources]
+#   ...
+
+
+[instance]
+debug-mode = on
+verbose-security = on
+eggs +=
+    plone.reload
+    Products.Clouseau
+
+
+
+[test]
+recipe = zc.recipe.testrunner
+eggs = 
+    ${instance:eggs}
+
+
+[omelette]
+recipe = collective.recipe.omelette
+eggs = 
+    ${zeoclient1:eggs}
+products = ${zeoclient1:products}
+
+
+[zopeskel]
+recipe = zc.recipe.egg
+eggs =
+    PasteScript
+    ZopeSkel
+
+
+[zopepy]
+recipe = zc.recipe.egg
+eggs = ${zeoclient1:eggs}
+interpreter = zopepy
+extra-paths = ${zope2:location}/lib/python
+scripts = zopepy
+
+
+[pydev]
+recipe = pb.recipes.pydev
+eggs =
+    Plone 
+    ${buildout:eggs} 
+    ${instance:eggs}
+
+
+

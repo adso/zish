@@ -1,0 +1,10 @@
+I am compiling python 2.4.6 from sources  to build my custom python environment in my home directory and  i set the next files in this locations to make sure the sys.path is modified ( even i am using the standard site-package place by now )
+>> use another version of zc.buildout
+
+
+Zope with Plone 4 fails 
+
+
+Where is located official mirror for pcgi.tar.gz ??
+
+
