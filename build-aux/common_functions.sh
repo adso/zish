@@ -123,7 +123,7 @@ local url_path dir_path
 url_path=$1
 dir_path=${2:-$PWD}
 ## be polite -w 3 --limit-rate=50K
-wget -w 3 --limit-rate=50K  --progress=bar -P $dir_path -- $url_path
+wget -w 3 --limit-rate=50K  --progress=bar:force -P $dir_path -- $url_path
 ##wget --spider -i $links
 return 0
 }

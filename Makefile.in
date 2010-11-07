@@ -827,7 +827,8 @@ all-custom-vars-am:
 	@echo "missing_headers="'"'${missing_headers}'"' 										 	>> ${abs_builddir}/zish.vars.tmp
 	@echo "distutilscfg="'"'${distutilscfg}'"' 										 			>> ${abs_builddir}/zish.vars.tmp
 	@echo "plonever="'"'${plonever}'"' 										 			        >> ${abs_builddir}/zish.vars.tmp
-	@mv ${abs_builddir}/zish.vars.tmp ${abs_builddir}/zish.vars  
+	@mv ${abs_builddir}/zish.vars.tmp ${abs_builddir}/zish.vars
+	@mkdir -p ${zishworkdir} &>/dev/null
 
 install-exec-zish-am:
 	$(INSTALL_ZISH) do-make-install ;
