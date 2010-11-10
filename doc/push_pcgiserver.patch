@@ -1,0 +1,35 @@
+--- ZServer/PCGIServer.py	2010-11-07 14:02:12.000000000 +0100
++++ ZServer_new/PCGIServer.py	2010-11-07 15:13:58.000000000 +0100
+@@ -1,6 +1,6 @@
+ ##############################################################################
+ #
+-# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
++# Copyright (c) 2002 Zope Foundation and Contributors.
+ #
+ # This software is subject to the provisions of the Zope Public License,
+ # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+@@ -188,12 +188,21 @@
+                     )
+                 )
+ 
+-    def push(self, producer, send=1):
++
++    # Overriden async_chat methods
++    def push(self, data, send=1):
+         # this is thread-safe when send is false
+         # note, that strings are not wrapped in
+         # producers by default
+-        self.producer_fifo.push(producer)
+-        if send: self.initiate_send()
++
++        # related with LP #418454, Python 2.6 or later
++        self.producer_fifo.append(data)
++        if send: 
++            self.initiate_send()
++
++    push_with_producer=push
++    
++
+ 
+     def __repr__(self):
+         return "<PCGIChannel at %x>" % id(self)

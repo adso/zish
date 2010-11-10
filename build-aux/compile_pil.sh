@@ -42,11 +42,11 @@ if [[ -n $dir_src_pil &&  -d $dir_src_pil ]]; then
 	tiff_path="$tiff_path_lib $tiff_path_inc"
 	zlib_path="$zlib_path_lib $zlib_path_inc"
 	tcl_path="$tcl_path_lib $tcl_path_inc"
-	freetype_path=$(echo $freetype_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \, ",$i) ; print $0 }' )
-	jpeg_path=$(echo $jpeg_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \, ",$i) ; print $0 }' )
-	tiff_path=$(echo $tiff_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \, ",$i) ; print $0 }' )
-	zlib_path=$(echo $zlib_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \, ",$i) ; print $0 }' )
-	tcl_path=$(echo $tcl_path | awk   '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \, ",$i) ; print $0 }' )
+	freetype_path=$(echo $freetype_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \\, ",$i) ; print $0 }' )
+	jpeg_path=$(echo $jpeg_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \\, ",$i) ; print $0 }' )
+	tiff_path=$(echo $tiff_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \\, ",$i) ; print $0 }' )
+	zlib_path=$(echo $zlib_path | awk '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \\, ",$i) ; print $0 }' )
+	tcl_path=$(echo $tcl_path | awk   '{ for(i=1;i<NF+1;i++) gsub(/.*/,"& \\, ",$i) ; print $0 }' )
 	sed $sed_opts  '{  s,^FREETYPE_ROOT[ 	]\+=[ 	]\+None,FREETYPE_ROOT='"$freetype_path"',g ; 
 			 s,^JPEG_ROOT[ 	]\+=[ 	]\+None,JPEG_ROOT='"$jpeg_path"',g ;
 			 s,^TIFF_ROOT[ 	]\+=[ 	]\+None,TIFF_ROOT='"$tiff_path"',g ; 

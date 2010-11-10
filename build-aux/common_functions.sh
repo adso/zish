@@ -1,6 +1,5 @@
 #! /bin/bash
 
-
 function check_distro() {
 echo -n "check_distro: begin... "
 LOWER='abcdefghijklmnopqrstuvwxyz'
@@ -62,7 +61,7 @@ debian)
 	sed_opts=""
 	find_opts=""
 	awk_opts=""
-    distro_type=""
+        distro_type=""
 ;;
 esac
 echo "distro_tunning: for $distro_type "
@@ -87,48 +86,55 @@ return 0
 
 
 
-
-check_downloads(){
+function check_downloads(){
 echo "check_downloads begin"
-url_list="$1"
-dir_base="${2:-$PWD}"
+local url_list="$1"
+local dir_base="${2:-$PWD}"
+local result=0
+mkfifo pipe
 if [[ -z "$url_list" ]]; then
     echo "$0 check_downloads needs an argument (file_path or var_url_list)"
 elif [[ -f "$url_list" ]];then
-    cat $url_list | while read url_item ; do
+    cat $url_list > pipe &
+    pid_fifo=$!
+    while read url_item ; do
         file_name="$dir_base/"$(basename $url_item)
         test -e "$file_name" || \
-            download_files "$url_item" "$dir_base" || \
-            { echo "$0 check_downloads : ERROR i can not find $file_name " ; false ; } 
-        echo "$file_name found "
-    done 
+            download_files "$url_item" "$dir_base" || { echo "download failed " ;  result=1;   break ; } 
+	done < pipe
 else
     url_list+=" $"
-    echo $url_list | while read -d " " url_item ; do
+    echo $url_list > pipe &
+    pid_fifo=$!
+    while read -d " " url_item ; do
         file_name="$dir_base/"$(basename $url_item)
         test -e "$file_name" || \
-            download_files "$url_item"  "$dir_base" || \
-                { echo "$0 check_downloads : ERROR i can not find $file_name " ; false ; } 
-        echo "$file_name found "
-    done 
+            download_files "$url_item"  "$dir_base" ||  { echo "download failed "  ; result=1 ; break ;  } 
+	 done < pipe
 fi
-return 0
+rm pipe
+if [[ $result -gt 0 ]]; then
+    return 1
+else
+    return 0
+fi
 }
 
 
 
-download_files() {
+function download_files() {
 echo "download_files begin"
 local url_path dir_path
 url_path=$1
 dir_path=${2:-$PWD}
 ## be polite -w 3 --limit-rate=50K
-wget -w 3 --limit-rate=50K  --progress=bar:force -P $dir_path -- $url_path
+wget -w 1 --limit-rate=50K  --progress=bar:force -P $dir_path -- $url_path || \
+    { echo "download_files ERROR" ; return 1 ; }
 ##wget --spider -i $links
 return 0
 }
 
-uncompress_archive(){
+function uncompress_archive(){
 local file_path=$1 
 local workdir=$2
 local file_log=/dev/null
@@ -169,6 +175,7 @@ else
 	echo -e "Usage $0 : INPUT_FILE OUPUT_FILE  [VAR_FILES ] 
 			 (vars must be in the form \${VAR})"
 fi
+shopt -s failglob
 }
 
 #function get_missing()

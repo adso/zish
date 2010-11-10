@@ -30,9 +30,10 @@ baseparts =
 eggs =
     elementtree
     Products.LinguaPlone
-    Products.Ploneboard
     Products.SimpleAttachment
     SQLAlchemy
+    
+# Products.Ploneboard #not ready for plone 4
 
 
 environment-vars =
@@ -99,7 +100,8 @@ target = ${buildout:directory}/products
 # http://pypi.python.org/pypi/plone.recipe.distros
 recipe = plone.recipe.distros
 urls = 
-    http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
+#http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
+# not ready for Plone 4
 nested-packages =
 version-suffix-packages =
 eggs =

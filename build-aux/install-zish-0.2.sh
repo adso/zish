@@ -76,7 +76,7 @@ prefix=${prefix:-"$HOME/opt"}
 ZISHRC=${ZISHRC:-"$HOME/.zishrc"}
 ROOT_PATH=${ROOT_PATH:-"/sbin:/usr/sbin"}
 PATH=${PATH:-"$prefix/bin:$PATH:$ROOT_PATH"}
-PATH_NONSTANDARD=${PATH_NONSTANDARD:-"/lib , /usr , $prefix"}
+PATH_NONSTANDARD=${PATH_NONSTANDARD:-"/  /lib  /usr  /root  $prefix"}
 abs_top_builddir=${abs_top_builddir:-$PWD}
 abs_top_srcdir=${abs_top_srcdir:-"$PWD"}
 abs_builddir=${abs_builddir:-$PWD}
@@ -116,7 +116,6 @@ tcl_path_lib=$(find $PATH_NONSTANDARD   -maxdepth 3  \( -iname "libtcl*.so"  \) 
 tcl_path_inc='"'$prefix'/include"'      #   "tcl.h"  no muestran versiones
 
 
-
 HEADING="#---zish---"
 PYTHONHOME=$prefix
 PYTHONPATH=$zishpythonsitedir
@@ -124,6 +123,9 @@ BUILDPYTHON=$prefix/bin/python
 BUILDPASTER=$prefix/bin/paster
 
 DIR_TREE={$prefix/srv,$prefix/tmp/{build,lib,scripts},$zishinstancedir,$zisheggs,$zishpkg,$zishhtmldir}
+
+pid_fifo=0
+
 
 prepare_account()
 {
@@ -206,7 +208,8 @@ echo "compile_xml2: end "
 
 compile_zope_standalone()
 {
-test -e "$prefix/bin/mkzopeinstance.py" && return 0
+echo "compile_zope_standalone "
+test -e "$prefix/bin/pcgi-wrapper" && return 0
 if [[ -d $dir_src_zope && -x $BUILDPYTHON ]]; then
 	cd $dir_src_zope
 	SPECIFIC_OPTS=" --prefix=$prefix --with-python=$BUILDPYTHON "
@@ -355,17 +358,43 @@ _EOF_
 
 # ............................................................................................
 ERROR_LOG=/dev/null
+
+
+function onexit(){
+	local exit_status=${1:-$?}
+	local ERROR=""
+	if [[ $exit_status -gt 0 ]]; then
+            ERROR="ERROR"
+	fi
+	echo "$0 : $ERROR onexit exiting with estatus: $exit_status"
+     	clearErrOptions && die
+	exit $exit_status
+}
+
+function onbreak(){
+	local exit_status=${1:-$?}
+	local ERROR=""
+	if [[ $exit_status -gt 0 ]]; then
+            ERROR="ERROR"
+	fi
+	echo "$0 : $ERROR onbreak exiting with estatus: $exit_status"
+        break
+	clearErrOptions && die
+}
+
+
 function setErrOptions()
 {
 	echo "$0 : setting error options"
 	set -o errexit
-	set -o nounset
 	set -o errtrace
+    	set -o nounset
 	set -o posix
 	#set -o pipefail
 	#shopt -s failglob
-	trap onexit hup int term ERR 
-    trap onbreak HUP INT TERM ERR  # la segunda machaca la primera. 
+	#trap onexit HUP INT TERM ERR 
+	#trap onbreak HUP INT TERM ERR # la segunda machaca la primera. 
+	trap onbreak ERR # la segunda machaca la primera. 
 
 }
 
@@ -378,34 +407,16 @@ function clearErrOptions()
 	set +o nounset
 	set +o errtrace
 	set +o posix
-    #set +o pipefail
+        #set +o pipefail
 	#shopt -u failglob
 	trap - ERR
 }
 
+function die()
+{
+   rm pipe || true
 
-function onexit(){
-	local exit_status=${1:-$?}
-	local ERROR=""
-	if [[ $exit_status -gt 0 ]]; then
-        ERROR="ERROR"
-	fi
-	echo "$0 : $ERROR onexit exiting with estatus: $exit_status" 
-	clearErrOptions
-	exit $exit_status
 }
-
-function onbreak(){
-	local exit_status=${1:-$?}
-	local ERROR=""
-	if [[ $exit_status -gt 0 ]]; then
-        ERROR="ERROR"
-	fi
-	echo "$0 : $ERROR onbreak exiting with estatus: $exit_status" 
-	clearErrOptions
- break;
-}
-
 
 # llamada al script ..........................................
 setErrOptions
@@ -413,9 +424,9 @@ while true;
 do 
     echo "$0 : main loop "
     # my commands ...    
-    source $abs_top_srcdir/build-aux/common_functions.sh
-    source $abs_top_srcdir/build-aux/compile_python.sh
-    source $abs_top_srcdir/build-aux/compile_pil.sh
+    . $abs_top_srcdir/build-aux/common_functions.sh
+    . $abs_top_srcdir/build-aux/compile_python.sh
+    . $abs_top_srcdir/build-aux/compile_pil.sh
     case "$1" in 
 	    do-make)
 	    do_make   2>&1 | tee $FILE_LOG
@@ -434,5 +445,5 @@ do
     # ..............................
     break
 done 
-clearErrOptions 
+clearErrOptions && die
 echo "$0 : end"

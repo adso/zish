@@ -3,6 +3,7 @@
 compile_python()
 {
 # Python does not support related environment variables (PYTHONPATH, ..) while compiling.
+test -e $prefix/bin/python${py_version_short} && return 0
 echo "compile_python: begin in " $dir_src_python
 if [[ -n $dir_src_python && -d $dir_src_python ]];then
  		cd $dir_src_python
