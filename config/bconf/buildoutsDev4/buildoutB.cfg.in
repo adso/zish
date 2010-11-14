@@ -1,5 +1,8 @@
 [buildout]
-executable = @prefix@/bin/python2.4
+#
+# This is buildoutB.cfg specific products and devel options are in buildoutT.cfg
+#
+executable = @prefix@/bin/python2.6
 eggs-directory = @prefix@/var/zopeservers/packages/eggs
 download-cache = @prefix@/var/zopeservers/packages/downloads
 
@@ -8,12 +11,13 @@ newest = false
 #install-from-cache = true
 unzip = true
 
-
+# Where to get the versions if necessary.
+# http://dist.plone.org/release/@PLONE_VERSION@/versions.cfg
+# http://good-py.appspot.com/release/dexterity/1.0b1 plone=@PLONE_VERSION@
 extends = 
     versions-Zope-2.12.3.cfg
     versions-@PLONE_VERSION@.cfg
 versions = versions
-
 
 
 baseparts =
@@ -23,21 +27,21 @@ baseparts =
     productdistros
 
 
-
-
-
 eggs =
     elementtree
     Products.LinguaPlone
-    Products.Ploneboard
     Products.SimpleAttachment
     SQLAlchemy
 
+#Products.Ploneboard # not ready for Plone4 yet.
 
+
+# Then we will call this variables in the instance section
 environment-vars =
     PYTHON_EGG_CACHE ${buildout:directory}/var/.python-eggs
     TMPDIR ${buildout:directory}/var/tmp
     PTS_LANGUAGES es,en,ca
+
 
 
 [zope2]
@@ -45,11 +49,10 @@ environment-vars =
 # http://pypi.python.org/pypi/plone.recipe.zope2install
 recipe = plone.recipe.zope2install
 fake-zope-eggs = true
+# zdaemon 
+additional-fake-eggs = zdaemon
 url = ${versions:zope2-url}
 zeo-address = 127.0.0.1:8100
-
-
-
 
 
 [instance]
@@ -88,18 +91,13 @@ storages =
 
 
 
-[zmysqlda]
-recipe = cns.recipe.zmysqlda
-target = ${buildout:directory}/products
-
-
-
 [productdistros]
 # For more information on this step and configuration options see:
 # http://pypi.python.org/pypi/plone.recipe.distros
 recipe = plone.recipe.distros
 urls = 
-    http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
+#    http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
+#    doesn't work for Plone4
 nested-packages =
 version-suffix-packages =
 eggs =
@@ -107,4 +105,3 @@ products =
     ${buildout:directory}/products
     ${productdistros:location}
 zcml =
-

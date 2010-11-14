@@ -121,7 +121,6 @@ fi
 }
 
 
-
 function download_files() {
 echo "download_files begin"
 local url_path dir_path
@@ -146,37 +145,35 @@ echo $file_path $workdir $file_log |
 return 0
 }
 
-
 function load_and_expand()
 {
 # @params  input_file output_file [vars_file]
-# In the input file , variables we want to expand must be in the form @VAR@  
-# to difference them from the others $VAR we want to let them be
-# It' s not a good idea to use ASCII codes because this codes 
-# can change depending the encoding, page code or language
-# Some sed versions can not put a \n in the replacement so this function would fail
-# Sed raise an error if not match ocurred, this can abort the script 
-# depending on bash err  options
+# In the input file , variables we want to expand must be in the form @VAR@ to difference them from the others $VAR we want to let them be
+# It' s not a good idea to use ASCII codes because this codes can change depending the encoding, page code or language
+# IMPORTANT
+#   This function will fail if any ' in the source file !
+#   Some sed versions can not put a \n in the replacement so this function would fail
+#   Sed raise an error if not match ocurred, this can abort the script depending on bash err  options
 shopt -u failglob
-Q="'"		 #  token="\"   ( ASCII code \x27 )
-D="\$"	     #  token="$"   ( ASCII code \x24 )
-TI="@"		 #  token="@"   ( ASCII code \x40 )
-TF="@"		 #  token="@"   ( ASCII code \x40 )
-CI="{"		 #  curly="{"   ( ASCII code \x7B )
-CF="}"       #  curly="}"   ( ASCII code \x7D )
-#TOKEN="#{"  #  token="#{"  ( ASCII code \x23\x7B )  his will substitute variables of the form #{VAR} to ${VAR}
+Q="'"  #  token="\"   ( ASCII code \x27 )
+D="\$" #  token="$"   ( ASCII code \x24 )
+TI="@" #  token="@"   ( ASCII code \x40 )
+TF="@" #  token="@"   ( ASCII code \x40 )
+CI="{" #  curly="{"   ( ASCII code \x7B )
+CF="}" #  curly="}"   ( ASCII code \x7D )
 if [[ -n $1 && -n $2 ]]; then
-	if [[ -e $3 ]]; then
+    if [[ -e $3 ]]; then
 	 . $3  # dot "." means same than "source"
-	fi
-eval echo -ne $(cat -E $1 | sed $sed_opts ' {  s/^/'$Q'/g ;  s/$/'$Q'/g  ; s/'$TI'\([a-zA-Z0-9_]\+\)'$TF'/'$Q$D$CI'\1'$CF$Q'/g ; } ' ) | \
-sed $sed_opts "s,\(\$ \|\$$\),\n,g" >$2 
+	 fi
+    eval echo -ne $(cat -E $1 | sed $sed_opts ' {  s/^/'$Q'/g ;  s/$/'$Q'/g  ; s/'$TI'\([a-zA-Z0-9_]\+\)'$TF'/'$Q$D$CI'\1'$CF$Q'/g ; } ' ) | \
+    sed $sed_opts "s,\(\$ \|\$$\),\n,g" >$2 
 else 
-	echo -e "Usage $0 : INPUT_FILE OUPUT_FILE  [VAR_FILES ] 
-			 (vars must be in the form \${VAR})"
+    echo -e "Usage $0 : INPUT_FILE OUPUT_FILE  [VAR_FILES ] 
+                        (vars must be in the form @VAR@   )"
 fi
 shopt -s failglob
 }
+
 
 #function get_missing()
 #{

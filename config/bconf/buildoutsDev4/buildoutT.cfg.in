@@ -1,40 +1,71 @@
 [buildout]
 extends =
     buildoutB.cfg
+# This is buildoutT.cfg , the specific buildout for development, with the next products available
+# mr.developer 	      	      : helps us to manage develop eggs
+# buildout.dumppickedversions : helps us keep track of which versions buildout has picked 
+# plone.reload  	      : allow to reload code without restarting the instance
+# omelette     		      : parts/omelette/links_to_products
+# roadrunner		      : for integration tests
+# test			      : give us a ./bin/test command which can use to run our tests 
 
-extensions = mr.developer
+extensions = 
+#    mr.developer
+    buildout.dumppickedversions
+
+
 sources = sources
+
+
+#products in svn which i have to check for last version every time i run buildout
 auto-checkout += 
 
 
-parts +=
-    test
-    omelette
-unzip = true
+parts =
+    ${buildout:baseparts} 
+    omelette 
+    zopepy 
+    test 
+    roadrunner
+
+
+
+develop =
+ 
+# If you're not using mr.developer to manage develop eggs, list eggs here. Globs OK.
+#    src/*
+
+
+
+eggs +=
+# development tools
+    plone.reload
+    Products.PDBDebugMode
+    Products.Closeau
 
 
 [omelette]
 recipe = collective.recipe.omelette
 eggs = ${instance:eggs}
-packages = ${instance:location}/lib/python ./
+packages = ${zope2:location}/lib/python ./
+
 
 [sources]
 #   ...
 
 
-[instance]
-debug-mode = on
-verbose-security = on
-eggs +=
-    plone.reload
-    Products.Clouseau
-
+[roadrunner]
+recipe = roadrunner:plone
+packages-under-test = 
+    example.conference
 
 
 [test]
 recipe = zc.recipe.testrunner
 eggs = 
-    ${instance:eggs}
+    example.conference
+extra-paths = ${zope2:location}/lib/python
+defaults = ['--exit-with-status', '--auto-color', '--auto-progress']
 
 
 [omelette]
@@ -53,7 +84,7 @@ eggs =
 
 [zopepy]
 recipe = zc.recipe.egg
-eggs = ${zeoclient1:eggs}
+eggs = ${instance:eggs}
 interpreter = zopepy
 extra-paths = ${zope2:location}/lib/python
 scripts = zopepy
@@ -65,6 +96,4 @@ eggs =
     Plone 
     ${buildout:eggs} 
     ${instance:eggs}
-
-
 

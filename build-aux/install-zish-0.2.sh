@@ -62,8 +62,8 @@ case $plonever in
     PLONE_VERSION="4.0rc1"   
     ZOPE_VERSION="2.12.10"   
     URLS_SRC="$URLS_SRC_PLONE4"
-    zishinstancename="zish_instance4"
-    buildoutver=${buildoutver:-"bconf/buildoutsProd4"} 
+    zishinstancename="zish_instance_dev4"
+    buildoutver=${buildoutver:-"bconf/buildoutsDev4"} 
 ;;
 *)
   echo "Plone version not found "
@@ -166,8 +166,14 @@ echo " prepare_account : end "
 extract_downloads(){
 for item in $URLS_SRC ; do
     file_name=$(basename $item)
+    dir_name=$file_name
+    dir_name=${dir_name%%.tar*}
+    dir_name=${dir_name%%.tgz*}
+    dir_name=${dir_name%%.zip*}
+    dir_name=${dir_name%%-src*}
     file_path=$zishworkdir/$file_name
-    uncompress_archive $file_path $zishworkdir
+    dir_path=$zishworkdir/$dir_name
+    test -d $dir_path || uncompress_archive $file_path $zishworkdir
 done
 }
 

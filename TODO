@@ -1,1 +1,7 @@
-Autoconf debe ser modificado para especificar si Plone 3 y Python 2.4 o bien Plone 4 y python 2.6
+- awk simple scaped and double scaped charaters (debian rpm )
+
+- function load_and_expand fails if any ' in the source file 
+
+- Some troubles when installing Plone 4 and Plone 3 with the same prefix=$HOME/opt 
+"Python needs a typedef for Py_ssize_t in pyport.h."
+installing Zope2 fails with AssertionError
