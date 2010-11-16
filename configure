@@ -695,6 +695,7 @@ FIND
 WGET
 LDFLAGS_NONSTANDARD
 CPPFLAGS_NONSTANDARD
+plonever
 USER
 HOME
 ZISH_SCRIPT
@@ -704,7 +705,6 @@ zishpythonsite
 zishpythondistutils
 outputdir
 distutilscfg
-plonever
 CC
 CFLAGS
 LDFLAGS
@@ -1355,8 +1355,8 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
---enable-distutils-home try to install with home approach
 --enable-plone4 preparing Plone 4 requirements see README
+--enable-distutils-home try to install with home approach
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
 
@@ -2546,11 +2546,21 @@ echo "$as_me: error: This --prefix=$prefix can try to install in a forbidden loc
 fi
 
 
+# Check whether --enable-plone4 was given.
+if test "${enable_plone4+set}" = set; then
+  enableval=$enable_plone4; plonever=4
+		 py_version_short=2.6
+else
+  plonever=3
+        py_version_short=2.4
+
+fi
 
 
-zishpythonlib=${prefix}/lib/python2.4
-zishpythonsite=${prefix}/lib/python2.4/site-customize
-zishpythondistutils=${prefix}/lib/python2.4/distutils
+
+zishpythonlib=${prefix}/lib/python${py_version_short}
+zishpythonsite=${prefix}/lib/python${py_version_short}/site-packages
+zishpythondistutils=${prefix}/lib/python${py_version_short}/distutils
 zishinstance=${prefix}/zopeservers
 #this values are better set from the custom install script (install-zish.sh)
 #zishinstancename=
@@ -2593,14 +2603,6 @@ fi
 
 
 
-
-# Check whether --enable-plone4 was given.
-if test "${enable_plone4+set}" = set; then
-  enableval=$enable_plone4; plonever=4
-else
-  plonever=3
-
-fi
 
 
 
@@ -7040,6 +7042,7 @@ FIND!$FIND$ac_delim
 WGET!$WGET$ac_delim
 LDFLAGS_NONSTANDARD!$LDFLAGS_NONSTANDARD$ac_delim
 CPPFLAGS_NONSTANDARD!$CPPFLAGS_NONSTANDARD$ac_delim
+plonever!$plonever$ac_delim
 USER!$USER$ac_delim
 HOME!$HOME$ac_delim
 ZISH_SCRIPT!$ZISH_SCRIPT$ac_delim
@@ -7049,7 +7052,6 @@ zishpythonsite!$zishpythonsite$ac_delim
 zishpythondistutils!$zishpythondistutils$ac_delim
 outputdir!$outputdir$ac_delim
 distutilscfg!$distutilscfg$ac_delim
-plonever!$plonever$ac_delim
 CC!$CC$ac_delim
 CFLAGS!$CFLAGS$ac_delim
 LDFLAGS!$LDFLAGS$ac_delim

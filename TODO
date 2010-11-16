@@ -4,4 +4,16 @@
 
 - Some troubles when installing Plone 4 and Plone 3 with the same prefix=$HOME/opt 
 "Python needs a typedef for Py_ssize_t in pyport.h."
-installing Zope2 fails with AssertionError
+installing Zope2 fails with AssertionError.   ===== Maybe solved because autoconf var was wrong.
+
+
+
+
+M) thetet left the room (quit: Ping timeout: 245 seconds).
+(09:34:23 PM) __adso: i am planning to make some zopeskel templates for plone 4 and dexterity .. anything already done or any place where to colaborate ? :)
+(09:35:06 PM) aclark: __adso: check w/cwarner
+(09:35:34 PM) Moo^_^: __adso: yes there was
+(09:35:54 PM) Moo^_^: __adso: http://svn.plone.org/svn/collective/collective.developermanual/trunk/source/misc/paster_templates.txt
+(09:36:47 PM) __adso: aclarck  Moo^_^:  thank you. 
+(09:36:49 PM) m8 left the room (quit: Quit: Sto andando via).
+(09:37:05 PM) __adso: :) this avoid to reinvent the wheel :)

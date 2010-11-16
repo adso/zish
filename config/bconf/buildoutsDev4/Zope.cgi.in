@@ -7,7 +7,7 @@ PCGI_MODULE_PATH=@zishinstancedir@/parts/zope2/lib/python/Zope2
 
 PCGI_PUBLISHER=@prefix@/bin/pcgi_publisher.py
 
-PCGI_EXE=@prefix@/bin/python2.4
+PCGI_EXE=@prefix@/bin/python@py_version_short@
 
 PCGI_SOCKET_FILE=@zishinstancedir@/var/pcgi.soc
 

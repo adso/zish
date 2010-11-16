@@ -81,11 +81,17 @@ AS_IF([test x"$athome" != x"0" ],
 	[AC_MSG_ERROR([This --prefix=$prefix can try to install in a forbidden location..])]
 )
 
+AC_ARG_ENABLE(plone4,--enable-plone4 preparing Plone 4 requirements see README , 
+		[plonever=4
+		 py_version_short=2.6],
+        [plonever=3
+        py_version_short=2.4]
+)
+AC_SUBST(plonever)
 
-
-zishpythonlib=${prefix}/lib/python2.4
-zishpythonsite=${prefix}/lib/python2.4/site-customize
-zishpythondistutils=${prefix}/lib/python2.4/distutils
+zishpythonlib=${prefix}/lib/python${py_version_short}
+zishpythonsite=${prefix}/lib/python${py_version_short}/site-packages
+zishpythondistutils=${prefix}/lib/python${py_version_short}/distutils
 zishinstance=${prefix}/zopeservers
 #this values are better set from the custom install script (install-zish.sh)
 #zishinstancename=
@@ -122,11 +128,7 @@ AC_SUBST(distutilscfg)
 
 
 
-AC_ARG_ENABLE(plone4,--enable-plone4 preparing Plone 4 requirements see README , 
-		[plonever=4],
-        [plonever=3]
-)
-AC_SUBST(plonever)
+
 
 
 #shell_pointer=/home/user/myvars.source

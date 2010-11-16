@@ -237,7 +237,6 @@ install_setuptools()
 {
 echo "install_setuptools: begin... "
 if test -x $BUILDPYTHON ; then
-	echo "install_setuptools: entering in :" $BUILDPYTHON 
 	test -e "$zishpythonsitedir/setuptools*egg"  || $BUILDPYTHON "$zishworkdir/ez_setup.py" #can fail if Cheetah or other eggs doesn't find headers  
 	test -e  "$zishpythonsitedir/ZopeSkel*egg" ||   $prefix/bin/easy_install ZopeSkel
 	test -e  "$zishpythonsitedir/virtualenv*egg" ||  $prefix/bin/easy_install virtualenv
@@ -255,6 +254,7 @@ if test -x $BUILDPYTHON ; then
 				load_and_expand $zishconfigdir/$buildoutver/buildoutT.cfg.in  $zishinstancedir/buildoutT.cfg none
 				load_and_expand $zishconfigdir/$buildoutver/versions-${PLONE_VERSION}.cfg.in $zishinstancedir/versions-${PLONE_VERSION}.cfg none
 				load_and_expand $zishconfigdir/$buildoutver/versions-Zope-${ZOPE_VERSION}.cfg.in $zishinstancedir/versions-Zope-${ZOPE_VERSION}.cfg none
+				load_and_expand $zishconfigdir/$buildoutver/versions-kgs-${PLONE_VERSION}.cfg.in $zishinstancedir/versions-kgs-${PLONE_VERSION}.cfg none
 				$BUILDPYTHON ./bootstrap.py -c buildoutT.cfg
 				./bin/buildout -c buildoutT.cfg
 				load_and_expand $zishconfigdir/$buildoutver/zope.conf.in $zishinstancedir/parts/instance/etc/zope.conf none

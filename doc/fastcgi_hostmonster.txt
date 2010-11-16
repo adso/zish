@@ -1,0 +1,165 @@
+
+Problem
+
+While trying to deploy my Django application, I am getting error pages.
+Solution
+
+There are a few basic troubleshooting steps that can be done to diagnose what's wrong. Visiting the site through a web browser is one diagnostic method. 500 errors that occur will have information in the main error log. Another thing to test is the mysite.fcgi file by running it directly via shell, if you have SSH access enabled. Each test can help you determine what the problem is.
+Problems with .htaccess
+
+When visiting in a browser, if there is a 500 error happening with the generic error message "Internal Server Error - The server encountered an internal error or misconfiguration and was unable to complete your request.", then it may be a .htaccess error. The error log will confirm it is a .htaccess problem if it references the .htaccess file when the error happens. For example, a typo in RewriteRule may result in an error that looks similar to the following:
+
+ 
+/home/username/public_html/.htaccess: Invalid command 'RewrireRule', perhaps misspelled or defined by a module not included in the server configuration
+
+Do a quick check over your .htaccess file and make sure there are no syntax errors, and try again. Once you're fairly certain it is no longer the .htaccess file that is causing the problem, and you're still having trouble, move on. In some cases, fixing the .htaccess file may be the only thing that needs to be done.
+Problems with mysite.fcgi
+
+If loading the web browser displays a 500 error that is similar to "500 Server Error A misconfiguration on the server caused a hiccup. Check the server logs, fix the problem, then try again.", then you may have a problem with the mysite.fcgi script. The error logs will confirm a problem with a mysite.fcgi file. There are various errors and error messages that you may come across. Fixing one error could make another error appear. Fix each problem as it comes until you have a working installation.
+File Permissions
+
+The following is an error log snippet for when the mysite.fcgi file is not executable:
+
+ 
+[Thu May 27 14:28:35 2010] [notice] mod_fcgid: process /home/username/public_html/mysite.fcgi(14904) exit(communication error), terminated by calling exit(), return code: 121
+suexec policy violation: see suexec log for more details
+[Thu May 27 14:28:35 2010] [warn] (104)Connection reset by peer: mod_fcgid: read data from fastcgi server error.
+[Thu May 27 14:28:35 2010] [error] [client 224.0.0.1] Premature end of script headers: mysite.fcgi
+
+Make sure that the mysite.fcgi file has permissions set to 755. Permissions of 777 will not work in our environment-- Apache recognizes 777 as unsafe and treats it like it has no permissions.
+Bad Interpretor
+
+Once the file is executable, if it still doesn't work, then there is likely a different problem with the mysite.fcgi file itself. A possible error log message when getting a 500 error related to the mysite.fcgi file is the following:
+
+ 
+[Thu May 27 15:19:49 2010] [warn] (104)Connection reset by peer: mod_fcgid: read data from fastcgi server error.
+[Thu May 27 15:19:49 2010] [error] [client 224.0.0.1] Premature end of script headers: mysite.fcgi
+[Thu May 27 15:19:55 2010] [notice] mod_fcgid: process /home/username/public_html/mysite.fcgi(10502) exit(communication error), terminated by calling exit(), return code: 1
+
+Instead of bad permissions, in this case the problem is a bad interpretor line. This can be confirmed by SSHing into your account, and attempting to run the mysite.fcgi file directly. Before manually running, make sure you run the command unset PYTHONPATH first, to more closely duplicate the environment the script is run in through Apache.:
+
+ 
+$ unset PYTHONPATH
+$ ./mysite.fcgi
+-bash: ./mysite.fcgi: /usr/bin/python^M: bad interpreter: No such file or directory
+
+In this case, the mysite.fcgi file was uploaded by FTP in binary mode instead of ASCII mode from a computer running Windows. As with any CGI or shell script that includes an interpretor line at the top, it must be uploaded in ascii mode, or converted to the unix-style newline format if it isn't already using that.
+
+The bad interpreter error can also happen if the #! line points to a location that doesn't exist. For example, #!/foo/bar/m/python in which case the error when running mysite.fcgi would look like this:
+
+ 
+$ ./mysite.fcgi
+-bash: ./mysite.fcgi: /foo/bar/m/python: bad interpreter: No such file or directory
+
+Python Errors and Exceptions
+
+If at this point the .htaccess file, the permissions of mysite.fcgi, and the #! line in mysite.fcgi are all good, and you are still getting an error, it is likely an error occurring in the Python code, including unhandled exceptions and syntax errors. This still produces a 500 error in the browser, and the error log will look similar to the following:
+
+ 
+Traceback (most recent call last):
+  File "/home/username/public_html/mysite.fcgi", line 13, in ?
+    from django.core.servers.fastcgi import runfastcgi
+ImportError: No module named django.core.servers.fastcgi
+[Thu May 27 16:02:56 2010] [warn] (104)Connection reset by peer: mod_fcgid: read data from fastcgi server error.
+[Thu May 27 16:02:56 2010] [error] [client 224.0.0.1] Premature end of script headers: mysite.fcgi
+[Thu May 27 16:02:58 2010] [notice] mod_fcgid: process /home/username/public_html/mysite.fcgi(30339) exit(communication error), terminated by calling exit(), return code: 1
+
+The same mysite.fcgi file, when run via SSH (after running unset PYTHONPATH) produces the following output:
+
+ 
+Traceback (most recent call last):
+  File "/home/username/public_html/mysite.fcgi", line 13, in ?
+    from django.core.servers.fastcgi import runfastcgi
+ImportError: No module named django.core.servers.fastcgi
+
+This particular ImportError means that the django package isn't found by Python when the script is run. Make sure that the directory holding the django package has been added to sys.path in mysite.fcgi. If your django installation is located at /home/username/.local/lib/python/django then you'll need to have sys.path.insert(0, "/home/username/.local/lib/python") in mysite.fcgi. If it is in a different directory, it too will need to be inserted to the sys.path list. You can add multiple locations to sys.path if needed.
+
+An example of a syntax error in the error_log is the following output:
+
+ 
+File "mysite.fcgi", line 7
+    sys.path.insert(0, "/home/username/")
+    ^
+SyntaxError: invalid syntax
+[Mon May 31 10:17:00 2010] [warn] (104)Connection reset by peer: mod_fcgid: read data from fastcgi server error.
+[Mon May 31 10:17:00 2010] [error] [client 224.0.0.1] Premature end of script headers: mysite.fcgi
+[Mon May 31 10:17:01 2010] [notice] mod_fcgid: call /home/username/public_html/500.php with wrapper /usr/local/cpanel/cgi-sys/fcgiwrapper
+
+And running mysite.fcgi directly looks like this:
+
+ 
+File "./mysite.fcgi", line 7
+    sys.path.insert(0, "/home/username/")
+    ^
+SyntaxError: invalid syntax
+
+The syntax error here is an indentation error. Python uses indentation to indicate code blocks. A line that shouldn't be in its own block was indented. Un-indenting that line fixes this particular syntax error.
+
+Another common traceback that is output is the following:
+
+ 
+ERROR: No module named flup
+  Unable to load the flup package.  In order to run django
+  as a FastCGI application, you will need to get flup from
+  http://www.saddi.com/software/flup/   If you've already
+  installed flup, then make sure you have it in your PYTHONPATH.
+
+This may happen, even if you have installed flup already. If you are using Python 2.4, and did a python setup.py install --home=$HOME/.local installation of flup, you likely have a flup egg file. This egg needs to be added to your Python path as well. If your flup egg is located at /home/username/.local/lib/python/flup-1.0.2-py2.4.egg, then you will need to add the following line to your mysite.fcgi file:
+
+ 
+sys.path.insert(0, "/home/username/.local/lib/python/flup-1.0.2-py2.4.egg")
+
+A third common error page displayed in the browser is the following message: "Unhandled Exception An unhandled exception was thrown by the application.", which happens after flup has been called, but an exception is thrown before Django starts up enough to be able to use its normal error handling. In the error logs it looks like the following:
+
+ 
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr: Traceback (most recent call last):
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "build/bdist.linux-x86_64/egg/flup/server/fcgi_base.py", line 558, in run
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "build/bdist.linux-x86_64/egg/flup/server/fcgi_base.py", line 1118, in handler
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "/home/username/.local/lib/python/django/core/handlers/wsgi.py", line 230, in __call__
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:     self.load_middleware()
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "/home/username/.local/lib/python/django/core/handlers/base.py", line 33, in load_middleware
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:     for middleware_path in settings.MIDDLEWARE_CLASSES:
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "/home/username/.local/lib/python/django/utils/functional.py", line 276, in __getattr__
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:     self._setup()
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "/home/username/.local/lib/python/django/conf/__init__.py", line 40, in _setup
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:     self._wrapped = Settings(settings_module)
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:   File "/home/username/.local/lib/python/django/conf/__init__.py", line 75, in __init__
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr:     raise ImportError("Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e))
+[Thu May 27 16:33:48 2010] [warn] mod_fcgid: stderr: ImportError: Could not import settings 'mysite.settings' (Is it on sys.path? Does it have syntax errors?): No module named mysite.settings
+
+When running mysite.fcgi manually, it looks like this:
+
+ 
+WSGIServer: missing FastCGI param REQUEST_METHOD required by WSGI!
+WSGIServer: missing FastCGI param SERVER_NAME required by WSGI!
+WSGIServer: missing FastCGI param SERVER_PORT required by WSGI!
+WSGIServer: missing FastCGI param SERVER_PROTOCOL required by WSGI!
+Traceback (most recent call last):
+  File "build/bdist.linux-x86_64/egg/flup/server/fcgi_base.py", line 558, in run
+  File "build/bdist.linux-x86_64/egg/flup/server/fcgi_base.py", line 1118, in handler
+  File "/home/username/.local/lib/python/django/core/handlers/wsgi.py", line 230, in __call__
+    self.load_middleware()
+  File "/home/username/.local/lib/python/django/core/handlers/base.py", line 33, in load_middleware
+    for middleware_path in settings.MIDDLEWARE_CLASSES:
+  File "/home/username/.local/lib/python/django/utils/functional.py", line 276, in __getattr__
+    self._setup()
+  File "/home/username/.local/lib/python/django/conf/__init__.py", line 40, in _setup
+    self._wrapped = Settings(settings_module)
+  File "/home/username/.local/lib/python/django/conf/__init__.py", line 75, in __init__
+    raise ImportError("Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e))
+ImportError: Could not import settings 'mysite.settings' (Is it on sys.path? Does it have syntax errors?): No module named mysite.settings
+Content-Type: text/html
+ 
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>Unhandled Exception</title>
+</head><body>
+<h1>Unhandled Exception</h1>
+<p>An unhandled exception was thrown by the application.</p>
+</body></html>
+
+This particular error happens when the settings module isn't found. In this case, the mysite Django project isn't on sys.path. Depending on where you've chosen to put your Django code, you may need to add a third location to sys.path in mysite.fcgi. In this case, adding sys.path.insert(0, "/home/username/django-projects") did the trick, because in this example, the mysite package is located at /home/username/django-projects/mysite.
+Other Errors
+
+At this point, you should have fixed any of the most common errors seen by Hostmonster users when getting their Django site working. If you have DEBUG on in your settings.py, you may see one of the nice styled error pages that Django generates. If you're getting the nicely formatted DEBUG=True error pages, (or if DEBUG is off, you get the error emails) then your Django deployment onto Hostmonster has been successful, and the error you are experiencing is out of the scope of this document.
+

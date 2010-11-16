@@ -9,12 +9,12 @@ compiler = unix
 #exec-prefix = @prefix@
 
 [easy_install]
-install-dir = @prefix@/lib/python2.4/site-packages
+install-dir = @prefix@/lib/python$py_version_short/site-packages
 script-dir = @prefix@/bin
 build-directory = @prefix@/tmp
 # uncomnented raise an error in rc.buildout about 
 # not found site-packages in sys.path
-#site-dirs = @prefix@/lib/python2.4/site-packages
+#site-dirs = @prefix@/lib/python$py_version_short/site-packages
 
 
 

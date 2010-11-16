@@ -2,29 +2,34 @@
 #
 # This is buildoutB.cfg specific products and devel options are in buildoutT.cfg
 #
-executable = @prefix@/bin/python2.6
+executable = @prefix@/bin/python@py_version_short@
 eggs-directory = @prefix@/var/zopeservers/packages/eggs
 download-cache = @prefix@/var/zopeservers/packages/downloads
 
-newest = false
+#newest = false
+prefer-final = true
 #index =  http://download.zope.org/ppix
 #install-from-cache = true
 unzip = true
 
 # Where to get the versions if necessary.
+# versions zope de donde ?
 # http://dist.plone.org/release/@PLONE_VERSION@/versions.cfg
-# http://good-py.appspot.com/release/dexterity/1.0b1 plone=@PLONE_VERSION@
+# http://good-py.appspot.com/release/dexterity/2.0-next=@PLONE_VERSION@
 extends = 
-    versions-Zope-2.12.3.cfg
+    versions-Zope-2.12.10.cfg
     versions-@PLONE_VERSION@.cfg
+    versions-kgs-@PLONE_VERSION@.cfg
 versions = versions
 
 
 baseparts =
+    productdistros
     zope2
     instance
+    zeoclient1
     fss
-    productdistros
+
 
 
 eggs =
@@ -47,10 +52,9 @@ environment-vars =
 [zope2]
 # For more information on this step and configuration options see:
 # http://pypi.python.org/pypi/plone.recipe.zope2install
+# This version does not need fake eggs
 recipe = plone.recipe.zope2install
-fake-zope-eggs = true
-# zdaemon 
-additional-fake-eggs = zdaemon
+fake-zope-eggs = false
 url = ${versions:zope2-url}
 zeo-address = 127.0.0.1:8100
 
@@ -76,6 +80,33 @@ products =
 
 environment-vars = ${buildout:environment-vars}
 
+zcml = 
+    zopeskel
+
+
+
+[zeoclient1]
+recipe = plone.recipe.zope2instance
+zope2-location = ${zope2:location}
+user = admin:admin
+#debug-mode = on
+verbose-security = on
+zeo-client = true
+zeodb-cache-size = 5000
+zeo-client-cache-size = 300MB
+zeo-address = ${zope2:zeo-address}
+publisher-profile-file = ${buildout:directory}/var/zeoclient1/zeoclient1.profile
+eggs =
+    Plone
+    ${buildout:eggs}
+
+zcml = 	
+
+products =
+    ${buildout:directory}/products
+    ${productdistros:location}
+
+
 
 
 [fss]
@@ -97,11 +128,8 @@ storages =
 recipe = plone.recipe.distros
 urls = 
 #    http://plone.org/products/attachmentfield/releases/1.4.4/attachmentfield-1-4-4.tgz
-#    doesn't work for Plone4
+#    doesn"t work for Plone4
 nested-packages =
 version-suffix-packages =
 eggs =
-products =
-    ${buildout:directory}/products
-    ${productdistros:location}
 zcml =

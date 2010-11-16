@@ -151,7 +151,8 @@ function load_and_expand()
 # In the input file , variables we want to expand must be in the form @VAR@ to difference them from the others $VAR we want to let them be
 # It' s not a good idea to use ASCII codes because this codes can change depending the encoding, page code or language
 # IMPORTANT
-#   This function will fail if any ' in the source file !
+#   This function will fail if any ' in the source file ! 
+#   ( we could substiture all of them for something different )
 #   Some sed versions can not put a \n in the replacement so this function would fail
 #   Sed raise an error if not match ocurred, this can abort the script depending on bash err  options
 shopt -u failglob

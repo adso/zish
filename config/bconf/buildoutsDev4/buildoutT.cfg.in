@@ -10,38 +10,53 @@ extends =
 # test			      : give us a ./bin/test command which can use to run our tests 
 
 extensions = 
-#    mr.developer
+    mr.developer
     buildout.dumppickedversions
 
-
-sources = sources
-
-
 #products in svn which i have to check for last version every time i run buildout
-auto-checkout += 
+# Once downloaded i can deactivate mr.developer extension
+sources = sources
+auto-checkout = 
+    zopeskel 
+    collective.developermanual
+    collective.dexteritypaste
 
 
 parts =
     ${buildout:baseparts} 
-    omelette 
-    zopepy 
     test 
     roadrunner
-
+    zopepy
+    omelette
+    paster
+    pydev
 
 
 develop =
- 
-# If you're not using mr.developer to manage develop eggs, list eggs here. Globs OK.
+#    src/zopeskel
+#    src/collective.developermanual
+#    src/collective.dexteritypaste
+#    src/freeinstants.templatespaste
+#    src/freeinstants.basictheme
+#    src/freeinstants.core 
+
+# If you"re not using mr.developer to manage develop eggs, list eggs here. Globs OK.
 #    src/*
 
 
 
 eggs +=
 # development tools
+    zopeskel
     plone.reload
     Products.PDBDebugMode
-    Products.Closeau
+    Products.Clouseau
+    plone.app.dexterity
+    collective.autopermission
+    collective.developermanual
+    collective.dexteritypaste
+
+
 
 
 [omelette]
@@ -51,35 +66,45 @@ packages = ${zope2:location}/lib/python ./
 
 
 [sources]
+zopeskel = svn https://svn.plone.org/svn/collective/ZopeSkel/trunk
+collective.developermanual = svn  http://svn.plone.org/svn/collective/collective.developermanual/trunk
+collective.dexteritypaste = svn  http://svn.plone.org/svn/collective/collective.dexteritypaste/trunk
 #   ...
 
 
 [roadrunner]
 recipe = roadrunner:plone
 packages-under-test = 
-    example.conference
+
 
 
 [test]
 recipe = zc.recipe.testrunner
 eggs = 
-    example.conference
+
 extra-paths = ${zope2:location}/lib/python
-defaults = ['--exit-with-status', '--auto-color', '--auto-progress']
+defaults = ["--exit-with-status", "--auto-color", "--auto-progress"]
 
 
 [omelette]
 recipe = collective.recipe.omelette
 eggs = 
-    ${zeoclient1:eggs}
-products = ${zeoclient1:products}
+    ${instance:eggs}
+products = ${instance:products}
 
 
-[zopeskel]
+[paster]
 recipe = zc.recipe.egg
+# Include your own template egg here.
+# Note that ${instance} section name should be the section name
+# for plone.recipe.zope2instance from your buildout.cfg
 eggs =
     PasteScript
     ZopeSkel
+    collective.dexteritypaste
+    freeinstants.templatespaste
+#    yourcompany.templates
+#    ${instance:eggs}
 
 
 [zopepy]
