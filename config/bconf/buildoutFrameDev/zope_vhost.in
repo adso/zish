@@ -84,14 +84,14 @@
 	
     WSGIPythonHome ${sandbox}
     WSGIDaemonProcess tmp threads=1 processes=4 maximum-requests=10000 python-path=${sandbox}/lib/python2.4/site-packages
-    <VirtualHost *:80>
+    #<VirtualHost *:80>
       ServerName my.machine.local
       WSGIScriptAlias /site ${sandbox}/bin/zope2.wsgi
       WSGIProcessGroup tmp
       WSGIPassAuthorization On
       SetEnv HTTP_X_VHM_HOST http://my.machine.local/site
       SetEnv PASTE_CONFIG ${sandbox}/etc/zope2.ini
-    </VirtualHost>
+    #</VirtualHost>
 
 	# ---------------------------------------------------------------------------------------------------
 	<IfModule fastcgi_module>

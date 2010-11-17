@@ -3,3 +3,5 @@
 
 Download error: [Errno 97] Address family not supported by protocol -- Some packages may not be found!
 
+This message indicates that the operating system does not support one of the (protocol) address families which slapd(8) was configured to support. Most commonly, this occurs when slapd(8) was configured to support IPv6 yet the operating system kernel wasn't. In such cases, the message can be ignored.
+
